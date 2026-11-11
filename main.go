@@ -13,14 +13,18 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
 	server := &http.Server{
-		Addr:    ":8000",
+		Addr:    ":" + port,
 		Handler: newMux(),
 	}
 
 	serverErrors := make(chan error, 1)
 	go func() {
-		log.Println("Server listening on :8000")
+		log.Printf("Server listening on :%s", port)
 		serverErrors <- server.ListenAndServe()
 	}()
 
