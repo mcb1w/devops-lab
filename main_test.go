@@ -51,3 +51,23 @@ func TestUnknownPath(t *testing.T) {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusNotFound)
 	}
 }
+
+func TestPostMethodsNotAllowed(t *testing.T) {
+	paths := []string{"/", "/health"}
+
+	for _, path := range paths {
+		t.Run(path, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, path, nil)
+			rec := httptest.NewRecorder()
+
+			newMux().ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusMethodNotAllowed {
+				t.Errorf("status = %d, want %d", rec.Code, http.StatusMethodNotAllowed)
+			}
+			if got, want := rec.Header().Get("Allow"), http.MethodGet; got != want {
+				t.Errorf("Allow header = %q, want %q", got, want)
+			}
+		})
+	}
+}
